@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 
 // Middleware
+app.set('trust proxy', 1); // Essential for Render/Heroku behind load balancers
 app.use(helmet());
 const allowedOrigins = [
     process.env.CLIENT_URL,

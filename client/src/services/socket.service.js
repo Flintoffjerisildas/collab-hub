@@ -6,7 +6,12 @@ class SocketService {
     socket;
 
     connect(options = {}) {
-        this.socket = io(SOCKET_URL, options);
+        this.socket = io(SOCKET_URL, {
+            ...options,
+            transports: ['websocket', 'polling'], // Try websocket first
+            withCredentials: true,
+            reconnectionAttempts: 5,
+        });
         return this.socket;
     }
 
