@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { socketUpdateProject } from '../redux/slices/projectSlice';
+import socketService from '../services/socket.service';
 import { useParams, useNavigate } from 'react-router-dom';
 import workspaceService from '../services/workspace.service';
 import Button from '../components/common/Button';
@@ -7,9 +10,14 @@ import { toast } from 'react-toastify';
 import { ArrowLeft } from 'lucide-react';
 import Alert from '../components/common/Alert';
 
+import { useDispatch } from 'react-redux';
+import { socketUpdateProject } from '../redux/slices/projectSlice';
+import socketService from '../services/socket.service';
+
 const Workspace = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [workspace, setWorkspace] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
@@ -28,7 +36,24 @@ const Workspace = () => {
         };
 
         fetchWorkspace();
-    }, [id, navigate]);
+
+        // Join workspace room for real-time updates
+        if (id) {
+            socketService.joinWorkspace(id);
+            socketService.onReceiveMessage((data) => {
+                if (data.type && data.type.startsWith('PROJECT_')) {
+                    dispatch(socketUpdateProject(data));
+                }
+            });
+        }
+
+        return () => {
+            if (id) {
+                socketService.leaveWorkspace(id);
+                socketService.offReceiveMessage();
+            }
+        }
+    }, [id, navigate, dispatch]);
 
     if (isLoading) {
         return <div className="p-10">Loading workspace...</div>;

@@ -41,6 +41,20 @@ const createProject = async (req, res) => {
         workspace.projects.push(project._id);
         await workspace.save();
 
+        // Real-time Update for Workspace Projects list
+        const io = req.app.get('io');
+        if (io) {
+            // We need to ensure users join a room for the workspace
+            // Since we don't have explicit 'join_workspace' yet in client, 
+            // we might need to rely on 'join_project' or implement 'join_workspace'. 
+            // For now, let's assume we will implement 'join_workspace' in client.
+            io.to(workspaceId.toString()).emit('receive_message', {
+                type: 'PROJECT_CREATED',
+                project: project,
+                workspaceId: workspaceId
+            });
+        }
+
         res.status(201).json(project);
     } catch (error) {
         res.status(res.statusCode || 500).json({ message: error.message });
@@ -212,6 +226,16 @@ const deleteProject = async (req, res) => {
         }
 
         await project.deleteOne();
+
+        // Real-time Update
+        const io = req.app.get('io');
+        if (io) {
+            io.to(workspace._id.toString()).emit('receive_message', {
+                type: 'PROJECT_DELETED',
+                projectId: req.params.id,
+                workspaceId: workspace._id
+            });
+        }
 
         res.status(200).json({ id: req.params.id, message: 'Project deleted successfully' });
     } catch (error) {

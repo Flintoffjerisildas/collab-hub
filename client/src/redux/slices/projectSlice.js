@@ -139,5 +139,5 @@ export const projectSlice = createSlice({
     },
 });
 
-export const { reset, resetProjects } = projectSlice.actions;
+export const { reset, resetProjects, socketUpdateProject } = projectSlice.actions;
 export default projectSlice.reducer;

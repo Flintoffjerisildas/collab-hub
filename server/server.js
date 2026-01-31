@@ -43,6 +43,17 @@ io.on('connection', (socket) => {
         console.log(`User ${userId} joined their personal room`);
     }
 
+    // Join a workspace room
+    socket.on('join_workspace', (workspaceId) => {
+        socket.join(workspaceId);
+        console.log(`User ${socket.id} joined workspace: ${workspaceId}`);
+    });
+
+    socket.on('leave_workspace', (workspaceId) => {
+        socket.leave(workspaceId);
+        console.log(`User ${socket.id} left workspace: ${workspaceId}`);
+    });
+
     // Join a project room
     socket.on('join_project', (projectId) => {
         socket.join(projectId);

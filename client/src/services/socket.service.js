@@ -33,6 +33,18 @@ class SocketService {
         }
     }
 
+    joinWorkspace(workspaceId) {
+        if (this.socket) {
+            this.socket.emit('join_workspace', workspaceId);
+        }
+    }
+
+    leaveWorkspace(workspaceId) {
+        if (this.socket) {
+            this.socket.emit('leave_workspace', workspaceId);
+        }
+    }
+
     sendMessage(messageData) {
         if (this.socket) {
             this.socket.emit('send_message', messageData);
