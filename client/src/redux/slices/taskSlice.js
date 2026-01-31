@@ -86,6 +86,19 @@ export const taskSlice = createSlice({
     initialState,
     reducers: {
         reset: (state) => initialState,
+        socketUpdate: (state, action) => {
+            const { type, task, taskId } = action.payload;
+            if (type === 'TASK_CREATED') {
+                state.tasks.push(task);
+            } else if (type === 'TASK_UPDATED') {
+                const index = state.tasks.findIndex((t) => t._id === task._id);
+                if (index !== -1) {
+                    state.tasks[index] = task;
+                }
+            } else if (type === 'TASK_DELETED') {
+                state.tasks = state.tasks.filter((t) => t._id !== taskId);
+            }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -131,5 +144,5 @@ export const taskSlice = createSlice({
     },
 });
 
-export const { reset } = taskSlice.actions;
+export const { reset, socketUpdate } = taskSlice.actions;
 export default taskSlice.reducer;

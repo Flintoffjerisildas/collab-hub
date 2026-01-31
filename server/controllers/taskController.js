@@ -59,6 +59,15 @@ const createTask = async (req, res) => {
             }
         }
 
+        // Real-time Update for Project Board
+        const io = req.app.get('io');
+        if (io) {
+            io.to(projectId.toString()).emit('receive_message', {
+                type: 'TASK_CREATED',
+                task: populatedTask
+            });
+        }
+
         res.status(201).json(populatedTask);
     } catch (error) {
         res.status(res.statusCode || 500).json({ message: error.message });
@@ -117,6 +126,15 @@ const updateTask = async (req, res) => {
             }
         }
 
+        // Real-time Update for Project Board
+        const io = req.app.get('io');
+        if (io) {
+            io.to(task.project.toString()).emit('receive_message', {
+                type: 'TASK_UPDATED',
+                task: updatedTask
+            });
+        }
+
         res.status(200).json(updatedTask);
     } catch (error) {
         res.status(res.statusCode || 500).json({ message: error.message });
@@ -136,6 +154,15 @@ const deleteTask = async (req, res) => {
         }
 
         await task.deleteOne();
+
+        // Real-time Update for Project Board
+        const io = req.app.get('io');
+        if (io) {
+            io.to(task.project.toString()).emit('receive_message', {
+                type: 'TASK_DELETED',
+                taskId: req.params.id
+            });
+        }
 
         res.status(200).json({ id: req.params.id });
     } catch (error) {

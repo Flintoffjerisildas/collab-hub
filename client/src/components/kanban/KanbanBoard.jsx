@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateTask, getProjectTasks } from '../../redux/slices/taskSlice';
+import { updateTask, getProjectTasks, socketUpdate } from '../../redux/slices/taskSlice';
+import socketService from '../../services/socket.service';
 import KanbanColumn from './KanbanColumn';
 import CreateTaskModal from './CreateTaskModal';
 import Button from '../common/Button';
@@ -15,6 +16,28 @@ const KanbanBoard = ({ projectId, members }) => {
     useEffect(() => {
         if (projectId) {
             dispatch(getProjectTasks(projectId));
+
+            // Join project room for real-time updates
+            socketService.joinProject(projectId);
+
+            // Listen for task updates
+            socketService.onReceiveMessage((data) => {
+                // Re-using the message listener for now, but ideally we have specific events
+                // Check if the message is actually a task update
+                if (data.type && data.type.startsWith('TASK_')) {
+                    // We need to export this action or just fetch all again
+                    // For true real-time without refetching, we dispatch the new action:
+                    dispatch(socketUpdate(data));
+                }
+            });
+
+            // We'll also add a specific listener for general project updates just in case
+            // Note: The backend needs to emit these specific events.
+        }
+
+        return () => {
+            socketService.leaveProject(projectId);
+            socketService.offReceiveMessage();
         }
     }, [projectId, dispatch]);
 
