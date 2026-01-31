@@ -38,6 +38,12 @@ const sendMessage = async (req, res) => {
         message = await message.populate('sender', 'name avatar email');
         message = await message.populate('project');
 
+        // Real-time Chat Update
+        const io = req.app.get('io');
+        if (io) {
+            io.to(projectId.toString()).emit('receive_message', message);
+        }
+
         res.status(201).json(message);
     } catch (error) {
         res.status(res.statusCode || 500).json({ message: error.message });

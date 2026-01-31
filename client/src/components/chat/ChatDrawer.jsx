@@ -79,8 +79,8 @@ const ChatDrawer = ({ projectId, isOpen, onClose }) => {
             // 1. Save to DB
             const result = await dispatch(sendMessage(messageData)).unwrap();
 
-            // 2. Emit to others via Socket
-            socketService.sendMessage(result);
+            // 2. Emit to others via Socket (Handled by backend now)
+            // socketService.sendMessage(result);
 
             // 3. Add to our own list (already done by getProjectMessages? No, we need to add explicitly or refetch)
             // The extraReducer for sendMessage handles adding it to state, so we are good there.
@@ -133,8 +133,8 @@ const ChatDrawer = ({ projectId, isOpen, onClose }) => {
                                 </div>
                                 <div
                                     className={`px-3 py-2 rounded-lg text-sm ${isOwnMessage
-                                            ? 'bg-primary text-primary-foreground rounded-tr-none'
-                                            : 'bg-secondary text-secondary-foreground rounded-tl-none'
+                                        ? 'bg-primary text-primary-foreground rounded-tr-none'
+                                        : 'bg-secondary text-secondary-foreground rounded-tl-none'
                                         }`}
                                 >
                                     {msg.content}

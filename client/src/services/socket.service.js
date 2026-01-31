@@ -12,6 +12,15 @@ class SocketService {
             withCredentials: true,
             reconnectionAttempts: 5,
         });
+
+        this.socket.on('connect', () => {
+            console.log('Socket Connected:', this.socket.id);
+        });
+
+        this.socket.on('connect_error', (err) => {
+            console.error('Socket Connection Error:', err);
+        });
+
         return this.socket;
     }
 
