@@ -20,7 +20,11 @@ const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
 // Socket.io setup
-const allowedOrigins = [process.env.CLIENT_URL || 'http://localhost:5173'];
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    'https://collab-hub-virid.vercel.app',
+    'http://localhost:5173'
+].filter(Boolean).map(url => url.replace(/\/$/, ''));
 const io = new Server(server, {
     cors: {
         origin: allowedOrigins,
