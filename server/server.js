@@ -22,7 +22,7 @@ const server = http.createServer(app);
 // Socket.io setup
 const allowedOrigins = [
     process.env.CLIENT_URL,
-    'https://collab-hub-virid.vercel.app',
+    'https://collab-hub-six.vercel.app',
     'http://localhost:5173'
 ].filter(Boolean).map(url => url.replace(/\/$/, ''));
 const io = new Server(server, {
