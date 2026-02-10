@@ -23,6 +23,7 @@ const Workspace = () => {
     const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
     useEffect(() => {
+        let handleWorkspaceUpdate;
         const fetchWorkspace = async () => {
             try {
                 const data = await workspaceService.getWorkspaceById(id);
@@ -40,17 +41,20 @@ const Workspace = () => {
         // Join workspace room for real-time updates
         if (id) {
             socketService.joinWorkspace(id);
-            socketService.onReceiveMessage((data) => {
+            handleWorkspaceUpdate = (data) => {
                 if (data.type && data.type.startsWith('PROJECT_')) {
                     dispatch(socketUpdateProject(data));
                 }
-            });
+            };
+            socketService.onReceiveMessage(handleWorkspaceUpdate);
         }
 
         return () => {
             if (id) {
                 socketService.leaveWorkspace(id);
-                socketService.offReceiveMessage();
+                if (handleWorkspaceUpdate) {
+                    socketService.offReceiveMessage(handleWorkspaceUpdate);
+                }
             }
         }
     }, [id, navigate, dispatch]);

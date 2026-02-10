@@ -14,6 +14,7 @@ const KanbanBoard = ({ projectId, members }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
+        let handleTaskUpdate;
         if (projectId) {
             dispatch(getProjectTasks(projectId));
 
@@ -21,7 +22,7 @@ const KanbanBoard = ({ projectId, members }) => {
             socketService.joinProject(projectId);
 
             // Listen for task updates
-            socketService.onReceiveMessage((data) => {
+            handleTaskUpdate = (data) => {
                 // Re-using the message listener for now, but ideally we have specific events
                 // Check if the message is actually a task update
                 if (data.type && data.type.startsWith('TASK_')) {
@@ -29,15 +30,20 @@ const KanbanBoard = ({ projectId, members }) => {
                     // For true real-time without refetching, we dispatch the new action:
                     dispatch(socketUpdate(data));
                 }
-            });
+            };
+            socketService.onReceiveMessage(handleTaskUpdate);
 
             // We'll also add a specific listener for general project updates just in case
             // Note: The backend needs to emit these specific events.
         }
 
         return () => {
-            socketService.leaveProject(projectId);
-            socketService.offReceiveMessage();
+            if (projectId) {
+                socketService.leaveProject(projectId);
+                if (handleTaskUpdate) {
+                    socketService.offReceiveMessage(handleTaskUpdate);
+                }
+            }
         }
     }, [projectId, dispatch]);
 

@@ -27,10 +27,14 @@ class SocketService {
         });
 
         // Re-attach listeners if they exist
-        this.listeners.forEach((callback, event) => {
-            if (!this.socket.hasListeners(event)) {
-                this.socket.on(event, callback);
-            }
+        this.listeners.forEach((callbacks, event) => {
+            callbacks.forEach(callback => {
+                if (this.socket && !this.socket.hasListeners(event)) {
+                    this.socket.on(event, callback);
+                } else if (this.socket) {
+                    this.socket.on(event, callback);
+                }
+            });
         });
 
         return this.socket;
@@ -64,16 +68,33 @@ class SocketService {
     }
 
     _on(event, callback) {
-        this.listeners.set(event, callback);
+        if (!this.listeners.has(event)) {
+            this.listeners.set(event, new Set());
+        }
+        this.listeners.get(event).add(callback);
+
         if (this.socket) {
             this.socket.on(event, callback);
         }
     }
 
-    _off(event) {
-        this.listeners.delete(event);
-        if (this.socket) {
-            this.socket.off(event);
+    _off(event, callback) {
+        if (this.listeners.has(event)) {
+            const callbacks = this.listeners.get(event);
+            if (callback) {
+                callbacks.delete(callback);
+                if (this.socket) {
+                    this.socket.off(event, callback);
+                }
+            } else {
+                callbacks.clear();
+                if (this.socket) {
+                    this.socket.off(event);
+                }
+            }
+            if (callbacks.size === 0) {
+                this.listeners.delete(event);
+            }
         }
     }
 
@@ -105,8 +126,8 @@ class SocketService {
         this._on('new_notification', callback);
     }
 
-    offReceiveMessage() {
-        this._off('receive_message');
+    offReceiveMessage(callback) {
+        this._off('receive_message', callback);
     }
 }
 
