@@ -10,9 +10,7 @@ import { toast } from 'react-toastify';
 import { ArrowLeft } from 'lucide-react';
 import Alert from '../components/common/Alert';
 
-import { useDispatch } from 'react-redux';
-import { socketUpdateProject } from '../redux/slices/projectSlice';
-import socketService from '../services/socket.service';
+
 
 const Workspace = () => {
     const { id } = useParams();
