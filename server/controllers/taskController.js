@@ -83,6 +83,15 @@ const getProjectTasks = async (req, res) => {
             .populate('assignee', 'name avatar email')
             .sort('order');
 
+        // Real-time Update for Project Board
+        const io = req.app.get('io');
+        if (io) {
+            io.to(req.params.projectId.toString()).emit('receive_message', {
+                type: 'TASKS_LOADED',
+                tasks
+            });
+        }
+
         res.status(200).json(tasks);
     } catch (error) {
         res.status(res.statusCode || 500).json({ message: error.message });
