@@ -63,7 +63,7 @@ const GitHubSettingsModal = ({ project, onClose, onUpdate }) => {
         }
     };
 
-    if (!user?.githubUsername) {
+    if (!user?.githubUsername && !project.githubRepoName) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                 <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-lg border">

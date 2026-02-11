@@ -143,6 +143,7 @@ const linkProject = async (req, res) => {
 
     project.githubRepoOwner = repoOwner;
     project.githubRepoName = repoName;
+    project.githubLinkedBy = req.user.id;
     await project.save();
 
     res.json(project);
@@ -160,16 +161,25 @@ const syncIssues = async (req, res) => {
         throw new Error('Project not linked to GitHub');
     }
 
-    const user = await User.findById(req.user.id);
-    if (!user.githubAccessToken) {
+    // Check for linker token if current user not connected
+    let accessToken = user.githubAccessToken;
+
+    if (!accessToken && project.githubLinkedBy) {
+        const linker = await User.findById(project.githubLinkedBy);
+        if (linker && linker.githubAccessToken) {
+            accessToken = linker.githubAccessToken;
+        }
+    }
+
+    if (!accessToken) {
         res.status(400);
-        throw new Error('User not connected to GitHub');
+        throw new Error('User not connected to GitHub and project linker not found');
     }
 
     try {
         const response = await axios.get(`https://api.github.com/repos/${project.githubRepoOwner}/${project.githubRepoName}/issues?state=open`, {
             headers: {
-                Authorization: `Bearer ${user.githubAccessToken}`
+                Authorization: `Bearer ${accessToken}`
             }
         });
 
@@ -222,16 +232,25 @@ const getCommits = async (req, res) => {
         throw new Error('Project not linked to GitHub');
     }
 
-    const user = await User.findById(req.user.id);
-    if (!user.githubAccessToken) {
+    // Check for linker token if current user not connected
+    let accessToken = user.githubAccessToken;
+
+    if (!accessToken && project.githubLinkedBy) {
+        const linker = await User.findById(project.githubLinkedBy);
+        if (linker && linker.githubAccessToken) {
+            accessToken = linker.githubAccessToken;
+        }
+    }
+
+    if (!accessToken) {
         res.status(400);
-        throw new Error('User not connected to GitHub');
+        throw new Error('User not connected to GitHub and project linker not found');
     }
 
     try {
         const response = await axios.get(`https://api.github.com/repos/${project.githubRepoOwner}/${project.githubRepoName}/commits?per_page=20`, {
             headers: {
-                Authorization: `Bearer ${user.githubAccessToken}`
+                Authorization: `Bearer ${accessToken}`
             }
         });
 

@@ -47,6 +47,10 @@ const projectSchema = mongoose.Schema(
         githubRepoName: {
             type: String,
         },
+        githubLinkedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
     },
     {
         timestamps: true,
