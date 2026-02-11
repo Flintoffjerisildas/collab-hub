@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import githubService from '../services/github.service';
+import { updateUser } from '../redux/slices/authSlice';
 
 const GitHubCallback = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const code = searchParams.get('code');
 
     useEffect(() => {
@@ -18,6 +21,12 @@ const GitHubCallback = () => {
 
             try {
                 const data = await githubService.handleCallback(code);
+
+                // Update user in redux
+                if (data.githubUsername) {
+                    dispatch(updateUser({ githubUsername: data.githubUsername }));
+                }
+
                 toast.success(data.message || 'GitHub connected successfully!');
                 navigate('/profile');
             } catch (error) {
