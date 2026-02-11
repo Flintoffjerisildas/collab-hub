@@ -7,7 +7,7 @@ const {
     linkProject,
     syncIssues
 } = require('../controllers/githubController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/auth');
 
 router.get('/auth', protect, githubAuth);
 router.post('/callback', protect, githubCallback);
