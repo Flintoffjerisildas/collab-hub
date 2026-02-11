@@ -209,10 +209,58 @@ const syncIssues = async (req, res) => {
 };
 
 
+
+// @desc    Get Project Commits
+// @route   GET /api/github/projects/:projectId/commits
+// @access  Private
+const getCommits = async (req, res) => {
+    const { projectId } = req.params;
+
+    const project = await Project.findById(projectId);
+    if (!project || !project.githubRepoOwner || !project.githubRepoName) {
+        res.status(400);
+        throw new Error('Project not linked to GitHub');
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user.githubAccessToken) {
+        res.status(400);
+        throw new Error('User not connected to GitHub');
+    }
+
+    try {
+        const response = await axios.get(`https://api.github.com/repos/${project.githubRepoOwner}/${project.githubRepoName}/commits?per_page=20`, {
+            headers: {
+                Authorization: `Bearer ${user.githubAccessToken}`
+            }
+        });
+
+        const commits = response.data.map(commit => ({
+            sha: commit.sha,
+            message: commit.commit.message,
+            author: {
+                name: commit.commit.author.name,
+                email: commit.commit.author.email,
+                date: commit.commit.author.date,
+                avatar_url: commit.author ? commit.author.avatar_url : null,
+                html_url: commit.author ? commit.author.html_url : null
+            },
+            html_url: commit.html_url
+        }));
+
+        res.json(commits);
+    } catch (error) {
+        console.error(error);
+        res.status(500);
+        throw new Error('Failed to fetch commits');
+    }
+};
+
 module.exports = {
     githubAuth,
     githubCallback,
     getRepos,
     linkProject,
-    syncIssues
+    syncIssues,
+    getCommits
 };

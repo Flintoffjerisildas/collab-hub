@@ -5,7 +5,8 @@ const {
     githubCallback,
     getRepos,
     linkProject,
-    syncIssues
+    syncIssues,
+    getCommits
 } = require('../controllers/githubController');
 const { protect } = require('../middleware/auth');
 
@@ -14,5 +15,6 @@ router.post('/callback', protect, githubCallback);
 router.get('/repos', protect, getRepos);
 router.post('/projects/:projectId/link', protect, linkProject);
 router.post('/projects/:projectId/sync', protect, syncIssues);
+router.get('/projects/:projectId/commits', protect, getCommits);
 
 module.exports = router;

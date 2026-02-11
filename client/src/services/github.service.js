@@ -33,6 +33,11 @@ const githubService = {
         const response = await api.post(`/github/projects/${projectId}/sync`);
         return response.data;
     },
+
+    getCommits: async (projectId) => {
+        const response = await api.get(`/github/projects/${projectId}/commits`);
+        return response.data;
+    },
 };
 
 export default githubService;
