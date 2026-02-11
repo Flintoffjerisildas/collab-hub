@@ -41,6 +41,7 @@ const sendMessage = async (req, res) => {
         // Real-time Chat Update
         const io = req.app.get('io');
         if (io) {
+            console.log(`Emitting new_message to room: ${projectId}`);
             io.to(projectId.toString()).emit('new_message', message);
         }
 

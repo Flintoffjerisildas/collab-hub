@@ -123,19 +123,31 @@ class SocketService {
     }
 
     onTaskCreated(callback) {
-        this._on('task_created', callback);
+        this._on('task_created', (data) => {
+            console.log('SocketService: Received task_created', data);
+            callback(data);
+        });
     }
 
     onTaskUpdated(callback) {
-        this._on('task_updated', callback);
+        this._on('task_updated', (data) => {
+            console.log('SocketService: Received task_updated', data);
+            callback(data);
+        });
     }
 
     onTaskDeleted(callback) {
-        this._on('task_deleted', callback);
+        this._on('task_deleted', (data) => {
+            console.log('SocketService: Received task_deleted', data);
+            callback(data);
+        });
     }
 
     onNewMessage(callback) {
-        this._on('new_message', callback);
+        this._on('new_message', (data) => {
+            console.log('SocketService: Received new_message', data);
+            callback(data);
+        });
     }
 
     onProjectCreated(callback) {

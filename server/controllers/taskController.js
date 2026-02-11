@@ -62,6 +62,7 @@ const createTask = async (req, res) => {
         // Real-time Update for Project Board
         const io = req.app.get('io');
         if (io) {
+            console.log(`Emitting task_created to room: ${projectId}`);
             io.to(projectId.toString()).emit('task_created', populatedTask);
         }
 
@@ -132,6 +133,7 @@ const updateTask = async (req, res) => {
         // Real-time Update for Project Board
         const io = req.app.get('io');
         if (io) {
+            console.log(`Emitting task_updated to room: ${task.project}`);
             io.to(task.project.toString()).emit('task_updated', updatedTask);
         }
 
@@ -158,6 +160,7 @@ const deleteTask = async (req, res) => {
         // Real-time Update for Project Board
         const io = req.app.get('io');
         if (io) {
+            console.log(`Emitting task_deleted to room: ${task.project}`);
             io.to(task.project.toString()).emit('task_deleted', req.params.id);
         }
 
