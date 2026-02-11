@@ -41,6 +41,12 @@ const projectSchema = mongoose.Schema(
             enum: ['public', 'private'],
             default: 'public', // visible to all workspace members
         },
+        githubRepoOwner: {
+            type: String,
+        },
+        githubRepoName: {
+            type: String,
+        },
     },
     {
         timestamps: true,

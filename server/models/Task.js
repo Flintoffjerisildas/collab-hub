@@ -44,7 +44,13 @@ const taskSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required: true
-        }
+        },
+        githubIssueId: {
+            type: Number,
+        },
+        githubIssueUrl: {
+            type: String,
+        },
     },
     {
         timestamps: true,

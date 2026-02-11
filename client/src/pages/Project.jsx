@@ -5,9 +5,10 @@ import Button from '../components/common/Button';
 import KanbanBoard from '../components/kanban/KanbanBoard';
 import ChatDrawer from '../components/chat/ChatDrawer';
 import AddMemberModal from '../components/project/AddMemberModal';
+import GitHubSettingsModal from '../components/project/GitHubSettingsModal';
 import NotificationDropdown from '../components/common/NotificationDropdown';
 import { toast } from 'react-toastify';
-import { ArrowLeft, MoreHorizontal, MessageSquare, UserPlus } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, MessageSquare, UserPlus, Github } from 'lucide-react';
 import Alert from '../components/common/Alert';
 
 const Project = () => {
@@ -17,6 +18,7 @@ const Project = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+    const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
     const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
     useEffect(() => {
@@ -58,6 +60,10 @@ const Project = () => {
                 </div>
                 <div className="flex items-center gap-2">
                     <NotificationDropdown />
+                    <Button variant="outline" size="sm" onClick={() => setIsGitHubModalOpen(true)}>
+                        <Github size={16} className="mr-2" />
+                        GitHub
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsChatOpen(!isChatOpen)}>
                         <MessageSquare size={16} className="mr-2" />
                         Chat
@@ -120,6 +126,15 @@ const Project = () => {
                             }
                         }
                     }}
+                />
+            )}
+
+            {/* GitHub Settings Modal */}
+            {isGitHubModalOpen && (
+                <GitHubSettingsModal
+                    project={project}
+                    onClose={() => setIsGitHubModalOpen(false)}
+                    onUpdate={(updatedProject) => setProject(updatedProject)}
                 />
             )}
         </div>

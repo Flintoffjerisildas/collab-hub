@@ -11,6 +11,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Workspace from './pages/Workspace';
 import Project from './pages/Project';
+import GitHubCallback from './pages/GitHubCallback';
 import Home from './pages/Home'; // Placeholder
 import NotFound from './pages/NotFound'; // Placeholder
 
@@ -49,6 +50,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/workspace/:id" element={<Workspace />} />
             <Route path="/project/:id" element={<Project />} />
+            <Route path="/github/callback" element={<GitHubCallback />} />
             <Route path="/" element={<Home />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

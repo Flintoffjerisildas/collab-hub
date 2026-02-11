@@ -45,6 +45,7 @@ app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/api/github', require('./routes/githubRoutes'));
 
 app.get('/', (req, res) => {
     res.send('API is running...');

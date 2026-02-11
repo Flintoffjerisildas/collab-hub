@@ -6,6 +6,7 @@ import Input from '../components/common/Input';
 import Label from '../components/common/Label';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api'; // Direct API call for now or create generic update service
+import githubService from '../services/github.service';
 
 const Profile = () => {
     const { user } = useSelector((state) => state.auth);
@@ -109,13 +110,46 @@ const Profile = () => {
                             </div>
                         </div>
                     </div>
+
+                    <div className="pt-4 border-t">
+                        <h3 className="text-lg font-medium mb-4">Integrations</h3>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="font-medium">GitHub</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {user && user.githubUsername
+                                        ? `Connected as ${user.githubUsername}`
+                                        : 'Connect your GitHub account to sync repositories and issues.'}
+                                </p>
+                            </div>
+                            <Button
+                                type="button"
+                                variant={user && user.githubUsername ? 'outline' : 'default'}
+                                onClick={async () => {
+                                    if (user && user.githubUsername) {
+                                        toast.info('Already connected');
+                                        return;
+                                    }
+                                    try {
+                                        const url = await githubService.getAuthUrl();
+                                        window.location.href = url;
+                                    } catch (error) {
+                                        toast.error('Failed to initiate GitHub connection');
+                                    }
+                                }}
+                            >
+                                {user && user.githubUsername ? 'Connected' : 'Connect GitHub'}
+                            </Button>
+                        </div>
+                    </div>
+
                     <div className="flex gap-4">
                         <Button type="submit">Update Profile</Button>
                         <Button type="button" onClick={() => navigate('/')}>Back</Button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 
