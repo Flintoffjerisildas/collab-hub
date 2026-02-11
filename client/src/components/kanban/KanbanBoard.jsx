@@ -14,7 +14,10 @@ const KanbanBoard = ({ projectId, members }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
-        let handleTaskUpdate;
+        let handleTaskCreated;
+        let handleTaskUpdated;
+        let handleTaskDeleted;
+
         if (projectId) {
             dispatch(getProjectTasks(projectId));
 
@@ -22,27 +25,29 @@ const KanbanBoard = ({ projectId, members }) => {
             socketService.joinProject(projectId);
 
             // Listen for task updates
-            handleTaskUpdate = (data) => {
-                // Re-using the message listener for now, but ideally we have specific events
-                // Check if the message is actually a task update
-                if (data.type && data.type.startsWith('TASK_')) {
-                    // We need to export this action or just fetch all again
-                    // For true real-time without refetching, we dispatch the new action:
-                    dispatch(socketUpdate(data));
-                }
+            handleTaskCreated = (task) => {
+                dispatch(socketUpdate({ type: 'TASK_CREATED', task }));
             };
-            socketService.onReceiveMessage(handleTaskUpdate);
 
-            // We'll also add a specific listener for general project updates just in case
-            // Note: The backend needs to emit these specific events.
+            handleTaskUpdated = (task) => {
+                dispatch(socketUpdate({ type: 'TASK_UPDATED', task }));
+            };
+
+            handleTaskDeleted = (taskId) => {
+                dispatch(socketUpdate({ type: 'TASK_DELETED', taskId }));
+            };
+
+            socketService.onTaskCreated(handleTaskCreated);
+            socketService.onTaskUpdated(handleTaskUpdated);
+            socketService.onTaskDeleted(handleTaskDeleted);
         }
 
         return () => {
             if (projectId) {
                 socketService.leaveProject(projectId);
-                if (handleTaskUpdate) {
-                    socketService.offReceiveMessage(handleTaskUpdate);
-                }
+                if (handleTaskCreated) socketService._off('task_created', handleTaskCreated);
+                if (handleTaskUpdated) socketService._off('task_updated', handleTaskUpdated);
+                if (handleTaskDeleted) socketService._off('task_deleted', handleTaskDeleted);
             }
         }
     }, [projectId, dispatch]);

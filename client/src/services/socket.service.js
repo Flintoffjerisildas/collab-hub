@@ -122,6 +122,30 @@ class SocketService {
         this._on('receive_message', callback);
     }
 
+    onTaskCreated(callback) {
+        this._on('task_created', callback);
+    }
+
+    onTaskUpdated(callback) {
+        this._on('task_updated', callback);
+    }
+
+    onTaskDeleted(callback) {
+        this._on('task_deleted', callback);
+    }
+
+    onNewMessage(callback) {
+        this._on('new_message', callback);
+    }
+
+    onProjectCreated(callback) {
+        this._on('project_created', callback);
+    }
+
+    onProjectDeleted(callback) {
+        this._on('project_deleted', callback);
+    }
+
     onNotification(callback) {
         this._on('new_notification', callback);
     }

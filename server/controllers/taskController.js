@@ -62,10 +62,7 @@ const createTask = async (req, res) => {
         // Real-time Update for Project Board
         const io = req.app.get('io');
         if (io) {
-            io.to(projectId.toString()).emit('receive_message', {
-                type: 'TASK_CREATED',
-                task: populatedTask
-            });
+            io.to(projectId.toString()).emit('task_created', populatedTask);
         }
 
         res.status(201).json(populatedTask);
@@ -86,10 +83,7 @@ const getProjectTasks = async (req, res) => {
         // Real-time Update for Project Board
         const io = req.app.get('io');
         if (io) {
-            io.to(req.params.projectId.toString()).emit('receive_message', {
-                type: 'TASKS_LOADED',
-                tasks
-            });
+            io.to(req.params.projectId.toString()).emit('tasks_loaded', tasks);
         }
 
         res.status(200).json(tasks);
@@ -138,10 +132,7 @@ const updateTask = async (req, res) => {
         // Real-time Update for Project Board
         const io = req.app.get('io');
         if (io) {
-            io.to(task.project.toString()).emit('receive_message', {
-                type: 'TASK_UPDATED',
-                task: updatedTask
-            });
+            io.to(task.project.toString()).emit('task_updated', updatedTask);
         }
 
         res.status(200).json(updatedTask);
@@ -167,10 +158,7 @@ const deleteTask = async (req, res) => {
         // Real-time Update for Project Board
         const io = req.app.get('io');
         if (io) {
-            io.to(task.project.toString()).emit('receive_message', {
-                type: 'TASK_DELETED',
-                taskId: req.params.id
-            });
+            io.to(task.project.toString()).emit('task_deleted', req.params.id);
         }
 
         res.status(200).json({ id: req.params.id });

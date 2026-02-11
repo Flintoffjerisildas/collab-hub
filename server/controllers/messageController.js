@@ -41,7 +41,7 @@ const sendMessage = async (req, res) => {
         // Real-time Chat Update
         const io = req.app.get('io');
         if (io) {
-            io.to(projectId.toString()).emit('receive_message', message);
+            io.to(projectId.toString()).emit('new_message', message);
         }
 
         res.status(201).json(message);

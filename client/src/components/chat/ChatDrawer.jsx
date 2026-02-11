@@ -19,7 +19,7 @@ const ChatDrawer = ({ projectId, isOpen, onClose }) => {
     };
 
     useEffect(() => {
-        let handleReceiveMessage;
+        let handleNewMessage;
         if (isOpen && projectId) {
             // 1. Fetch historical messages
             dispatch(getProjectMessages(projectId));
@@ -29,18 +29,18 @@ const ChatDrawer = ({ projectId, isOpen, onClose }) => {
             socketService.joinProject(projectId);
 
             // 3. Listen for incoming messages
-            handleReceiveMessage = (message) => {
+            handleNewMessage = (message) => {
                 dispatch(addMessage(message));
                 scrollToBottom();
             };
-            socketService.onReceiveMessage(handleReceiveMessage);
+            socketService.onNewMessage(handleNewMessage);
         }
 
         return () => {
             if (isOpen && projectId) {
                 socketService.leaveProject(projectId);
-                if (handleReceiveMessage) {
-                    socketService.offReceiveMessage(handleReceiveMessage);
+                if (handleNewMessage) {
+                    socketService._off('new_message', handleNewMessage);
                 }
                 // We typically don't disconnect the socket entirely if we want to reuse the connection,
                 // but for this specific component lifecycle it's fine to leave the room.
