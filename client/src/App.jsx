@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addNotification } from './redux/slices/notificationSlice';
 import socketService from './services/socket.service';
 
+import SocketStatus from './components/common/SocketStatus';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -55,6 +56,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
+        {user && <SocketStatus />}
       </Router>
       <ToastContainer />
     </>
