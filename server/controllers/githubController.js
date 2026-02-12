@@ -162,7 +162,7 @@ const syncIssues = async (req, res) => {
     }
 
     // Check for linker token if current user not connected
-    let accessToken = user.githubAccessToken;
+    let accessToken = req.user.githubAccessToken;
 
     if (!accessToken && project.githubLinkedBy) {
         const linker = await User.findById(project.githubLinkedBy);
@@ -233,7 +233,7 @@ const getCommits = async (req, res) => {
     }
 
     // Check for linker token if current user not connected
-    let accessToken = user.githubAccessToken;
+    let accessToken = req.user.githubAccessToken;
 
     if (!accessToken && project.githubLinkedBy) {
         const linker = await User.findById(project.githubLinkedBy);
