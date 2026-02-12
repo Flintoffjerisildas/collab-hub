@@ -27,8 +27,21 @@ const allowedOrigins = [
 ].filter(Boolean).map(url => url.replace(/\/$/, ''));
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigins,
-        methods: ['GET', 'POST'],
+        origin: (origin, callback) => {
+            const allowedOrigins = [
+                process.env.CLIENT_URL,
+                'http://localhost:5173',
+                'http://localhost:5000'
+            ].filter(Boolean).map(url => url.replace(/\/$/, ''));
+
+            if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+                callback(null, true);
+            } else {
+                console.log('Blocked by CORS:', origin);
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         credentials: true,
     },
 });
