@@ -11,8 +11,19 @@ class SocketService {
     connect(options = {}) {
         if (this.socket && this.socket.connected) return this.socket;
 
-        this.socket = io(SOCKET_URL, {
+        // Sanitize URL to remove path/namespace if present
+        let connectionUrl = SOCKET_URL;
+        try {
+            const url = new URL(SOCKET_URL);
+            connectionUrl = url.origin;
+            console.log('SocketService: Connecting to origin:', connectionUrl);
+        } catch (e) {
+            console.error('SocketService: Invalid URL format, using as is:', SOCKET_URL);
+        }
+
+        this.socket = io(connectionUrl, {
             ...options,
+            path: '/socket.io',
             transports: ['websocket', 'polling'],
             withCredentials: true,
             reconnectionAttempts: 5,
