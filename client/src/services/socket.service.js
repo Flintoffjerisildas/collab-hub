@@ -6,6 +6,7 @@ class SocketService {
     socket = null;
     pendingEmits = [];
     listeners = new Map();
+    activeRooms = new Map(); // Track active rooms for reconnection
 
     connect(options = {}) {
         if (this.socket && this.socket.connected) return this.socket;
@@ -20,6 +21,7 @@ class SocketService {
         this.socket.on('connect', () => {
             console.log('Socket Connected:', this.socket.id);
             this._processPendingActions();
+            this._rejoinRooms();
         });
 
         this.socket.on('connect_error', (err) => {
@@ -50,6 +52,19 @@ class SocketService {
         }
     }
 
+    _rejoinRooms() {
+        if (this.activeRooms.size > 0) {
+            console.log('Re-joining active rooms:', Array.from(this.activeRooms.values()));
+            this.activeRooms.forEach(room => {
+                if (room.type === 'project') {
+                    this.socket.emit('join_project', room.id);
+                } else if (room.type === 'workspace') {
+                    this.socket.emit('join_workspace', room.id);
+                }
+            });
+        }
+    }
+
     disconnect() {
         if (this.socket) {
             this.socket.disconnect();
@@ -57,6 +72,7 @@ class SocketService {
         }
         this.pendingEmits = [];
         this.listeners.clear();
+        this.activeRooms.clear();
     }
 
     _emit(event, data) {
@@ -99,18 +115,22 @@ class SocketService {
     }
 
     joinProject(projectId) {
+        this.activeRooms.set(`project:${projectId}`, { type: 'project', id: projectId });
         this._emit('join_project', projectId);
     }
 
     leaveProject(projectId) {
+        this.activeRooms.delete(`project:${projectId}`);
         this._emit('leave_project', projectId);
     }
 
     joinWorkspace(workspaceId) {
+        this.activeRooms.set(`workspace:${workspaceId}`, { type: 'workspace', id: workspaceId });
         this._emit('join_workspace', workspaceId);
     }
 
     leaveWorkspace(workspaceId) {
+        this.activeRooms.delete(`workspace:${workspaceId}`);
         this._emit('leave_workspace', workspaceId);
     }
 
